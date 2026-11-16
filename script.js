@@ -610,7 +610,7 @@ function App() {
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
             <Header cartCount={cartCount} setPage={setPage} currentUser={currentUser} logout={logout} />
             <main className="container" style={{ flex: 1, paddingTop: '20px' }}>{content}</main>
-            <footer className="footer"><p>© 2026 FlowerShop. Курсовая работа Олейникова М.В.</p></footer>
+            <footer className="footer"><p>© 2026 FlowerShop. Курсовая работа Олейников М.В.</p></footer>
         </div>
     );
 }
