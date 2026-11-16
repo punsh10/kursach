@@ -1,7 +1,7 @@
 const { useState, useEffect } = React;
 
 /* ============================================================
-   ЛОКАЛЬНАЯ БАЗА ДАННЫХ (замена PHP + MySQL)
+   ЛОКАЛЬНАЯ БАЗА ДАННЫХ
    ============================================================ */
 const LocalDB = {
     KEYS: { USERS: 'flower-users', ORDERS: 'flower-orders' },
@@ -16,12 +16,7 @@ const LocalDB = {
         if (!users.find(u => u.email === 'admin@flowershop.ru')) {
             const nextId = users.length ? Math.max(...users.map(u => u.id)) + 1 : 1;
             users.push({
-                id: nextId,
-                name: 'Администратор',
-                email: 'admin@flowershop.ru',
-                password: 'admin123',
-                phone: '+7 (999) 111-11-11',
-                role: 'admin'
+                id: nextId, name: 'Администратор', email: 'admin@flowershop.ru', password: 'admin123', phone: '+7 (999) 111-11-11', role: 'admin'
             });
             this.saveUsers(users);
         }
@@ -29,21 +24,16 @@ const LocalDB = {
 
     register({ name, email, password, phone }) {
         const users = this.getUsers();
-        if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
-            return { error: 'Пользователь с таким email уже существует' };
-        }
+        if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) return { error: 'Пользователь с таким email уже существует' };
         const id = users.length ? Math.max(...users.map(u => u.id)) + 1 : 1;
         const user = { id, name, email, password, phone, role: 'user' };
-        users.push(user);
-        this.saveUsers(users);
+        users.push(user); this.saveUsers(users);
         const { password: _, ...safe } = user;
         return { success: true, user: safe };
     },
 
     login(email, password) {
-        const user = this.getUsers().find(
-            u => u.email.toLowerCase() === email.toLowerCase() && u.password === password
-        );
+        const user = this.getUsers().find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
         if (!user) return { error: 'Неверный email или пароль' };
         const { password: _, ...safe } = user;
         return { success: true, user: safe };
@@ -57,10 +47,7 @@ const LocalDB = {
         return { success: true, order_id: id };
     },
 
-    getUserOrders(userId) {
-        return this.getOrders().filter(o => String(o.user_id) === String(userId));
-    },
-
+    getUserOrders(userId) { return this.getOrders().filter(o => String(o.user_id) === String(userId)); },
     getAllOrders() { return this.getOrders(); },
 
     updateStatus(orderId, status) {
@@ -75,18 +62,18 @@ const LocalDB = {
 
 /* ================= КАТАЛОГ ================= */
 const FLOWERS_DATA = [
-    { id: 1, title: "Букет 'Белый шик'", price: 4100, category: "Микс", image: "images/1-white.png", description: "Роскошный и нежный букет, состоящий из белых роз, гортензий и калл. Идеально подходит для свадебного торжества или в качестве изысканного подарка." },
+    { id: 1, title: "Букет 'Белый шик'", price: 4100, category: "Микс", image: "images/1-white.png", description: "Элегантный и торжественный букет из белых роз, гортензий и калл. Безупречный выбор для свадьбы или изысканного подарка." },
     { id: 2, title: "Букет 'Красное сердце'", price: 3900, category: "Розы", image: "images/2-red.png", description: "Классика жанра. Букет из 15 бархатных красных роз, дополненный веточками эвкалипта и декоративными бусинами. Символ страстной любви." },
     { id: 3, title: "Букет 'Весенний бриз'", price: 2800, category: "Микс", image: "images/3-spring.png", description: "Яркая и свежая композиция из тюльпанов, гиацинтов и мимозы. Этот букет подарит весеннее настроение даже в самый пасмурный день." },
     { id: 4, title: "Букет 'Розовое облако'", price: 3500, category: "Пионы", image: "images/4-pink.png", description: "Воздушный и романтичный букет из крупных розовых пионов и кустовых роз. Нежные оттенки и пышные формы покорят любую девушку." },
-    { id: 5, title: "Букет 'Закат в Провансе'", price: 4500, category: "Микс", image: "images/5-provence.png", description: "Французский шарм в каждой веточке. Розы пудровых оттенков, лаванда и ароматный эвкалипт создают атмосферу уюта и тепла." },
-    { id: 6, title: "Букет 'Полевой роман'", price: 2100, category: "Полевые", image: "images/6-field.png", description: "Искренний и простой букет из ромашек, васильков и колосков. Для тех, кто ценит естественную красоту и теплоту полевых цветов." }
+    { id: 5, title: "Букет 'Закат в Провансе'", price: 4500, category: "Микс", image: "images/5-provence.png", description: "Уютный французский стиль: лаванда, розы пудровых оттенков и эвкалипт. Создает атмосферу тепла и романтики." },
+    { id: 6, title: "Букет 'Полевой роман'", price: 2100, category: "Полевые", image: "images/6-field.png", description: "Искренняя и простая композиция из ромашек, васильков и колосков. Ностальгия по лету и естественная красота." }
 ];
 
 const GIFT_SETS_DATA = [
-    { id: 101, title: "Набор «Sunny Harvest»", price: 2500, image: "images/gift-sunny.png", description: "Искренний и полезный подарок, наполненный витаминами и теплом. В плетеную корзину мы бережно уложили свежие сезонные фрукты (яблоки, апельсины, виноград), баночку отборного варенья и травяной чай для укрепления здоровья. Классический знак внимания, который согреет сердце." },
-    { id: 102, title: "Набор «Cozy Mood»", price: 3500, image: "images/gift-cozy.png", description: "Идеальный набор для тех, кто ценит уютные вечера. Внутри стильной белой корзины вы найдете мягкого плюшевого мишку, плитку крафтового шоколада, ароматическую свечу для создания теплой атмосферы и стильную керамическую кружку. Этот набор — отличный способ сказать «Я тебя люблю»." },
-    { id: 103, title: "Набор «Silk & Tea»", price: 5800, image: "images/gift-silk.png", description: "Роскошный набор для истинного расслабления. В элегантной корзине: премиальные сорта листового чая, натуральный цветочный мед, изысканная чайная пара и бутылка благородного вина. Создан для того, чтобы мама могла налить себе чашку чая, расслабиться и почувствовать себя особенной." }
+    { id: 101, title: "Набор «Sunny Harvest»", price: 2500, image: "images/gift-sunny.png", description: "Искренний и полезный подарок, наполненный витаминами и теплом. В плетеную корзину мы бережно уложили свежие сезонные фрукты, баночку отборного варенья и травяной чай." },
+    { id: 102, title: "Набор «Cozy Mood»", price: 3500, image: "images/gift-cozy.png", description: "Идеальный набор для тех, кто ценит уютные вечера. Внутри стильной корзины вы найдете плюшевого мишку, крафтовый шоколад, ароматическую свечу и керамическую кружку." },
+    { id: 103, title: "Набор «Silk & Tea»", price: 5800, image: "images/gift-silk.png", description: "Роскошный набор для истинного расслабления: премиальный чай, цветочный мед, изысканная чайная пара и бутылка благородного вина." }
 ];
 
 const CONSTRUCTOR_FLOWERS = [
@@ -110,7 +97,7 @@ const CONSTRUCTOR_GREENERY = [
     { id: 'eucalyptus', title: 'Эвкалипт', price: 80, image: 'images/green-eucalyptus.png' }
 ];
 
-/* ================= ШАПКА ================= */
+/* ================= КОМПОНЕНТЫ ================= */
 function Header({ cartCount, setPage, currentUser, logout }) {
     const scrollToSection = (id, pageName) => {
         setPage(pageName);
@@ -163,7 +150,6 @@ function Header({ cartCount, setPage, currentUser, logout }) {
     );
 }
 
-/* ================= КАРТОЧКА ТОВАРА ================= */
 function ProductCard({ product, addToCart, onOpen }) {
     return (
         <div className="product-card glass-panel" onClick={() => onOpen(product)}>
@@ -179,7 +165,6 @@ function ProductCard({ product, addToCart, onOpen }) {
     );
 }
 
-/* ================= МОДАЛКА ТОВАРА ================= */
 function ProductModal({ product, onClose, addToCart }) {
     if (!product) return null;
     return (
@@ -204,7 +189,6 @@ function ProductModal({ product, onClose, addToCart }) {
     );
 }
 
-/* ================= КОНСТРУКТОР БУКЕТА ================= */
 function BouquetConstructor({ isOpen, onClose, addToCart }) {
     const [qty, setQty] = useState({});
     if (!isOpen) return null;
@@ -234,15 +218,9 @@ function BouquetConstructor({ isOpen, onClose, addToCart }) {
             if (qty[opt.id]) details.push(`${opt.title} (${qty[opt.id]} шт.)`);
         });
         addToCart({
-            id: 'custom_' + Date.now(),
-            title: "Индивидуальный букет",
-            price: total,
-            image: "images/4-pink.png",
-            quantity: 1,
-            description: details.join(', ')
+            id: 'custom_' + Date.now(), title: "Индивидуальный букет", price: total, image: "images/4-pink.png", quantity: 1, description: details.join(', ')
         });
-        setQty({});
-        onClose();
+        setQty({}); onClose();
     };
 
     const renderOptions = (options, title) => (
@@ -286,10 +264,15 @@ function BouquetConstructor({ isOpen, onClose, addToCart }) {
     );
 }
 
-/* ================= ГЛАВНАЯ ================= */
 function HomePage({ addToCart }) {
     const [isConstructorOpen, setIsConstructorOpen] = useState(false);
     const [selectedBouquet, setSelectedBouquet] = useState(null);
+
+    const featured = [
+        FLOWERS_DATA.find(p => p.title.includes("Белый шик")),
+        FLOWERS_DATA.find(p => p.title.includes("Полевой роман")),
+        FLOWERS_DATA.find(p => p.title.includes("Закат в Провансе"))
+    ].filter(Boolean);
 
     return (
         <div id="top">
@@ -304,6 +287,32 @@ function HomePage({ addToCart }) {
                 </section>
             </div>
 
+            {/* БАННЕР */}
+            <div className="featured-banner-container">
+                <div className="featured-images">
+                    {featured.map(bouquet => (
+                        <div key={bouquet.id} className="featured-img-wrapper">
+                            <img src={bouquet.image} alt={bouquet.title} />
+                            <div className="featured-label">
+                                <h4>{bouquet.title.replace("Букет ", "")}</h4>
+                                <p>{bouquet.price} ₽</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                <div className="featured-text-panel">
+                    <h2>Выбери какой букет хочешь ты!</h2>
+                    <p style={{marginTop: '20px', color: '#555', lineHeight: '1.6'}}>
+                        Каждый из этих букетов — настоящая история. 
+                        От элегантного «Белого шика» до ностальгического «Полевого романа». 
+                        Нажми на карточку товара в каталоге, чтобы добавить его в корзину.
+                    </p>
+                    <button className="btn" style={{marginTop: '30px'}} onClick={() => document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth' })}>
+                        Смотреть весь каталог
+                    </button>
+                </div>
+            </div>
+
             <div className="home-section glass-panel">
                 <div className="about-section">
                     <div className="about-image">
@@ -313,7 +322,7 @@ function HomePage({ addToCart }) {
                         <h1>О компании FlowerShop</h1>
                         <p>FlowerShop на рынке уже более 8 лет. За это время мы прошли путь от небольшой лавки до современного сервиса доставки. Наша главная гордость — собственные оранжереи.</p>
                         <p>Благодаря этому мы контролируем качество на всех этапах: от посадки семян до момента, когда букет оказывается в руках получателя.</p>
-                        <p>Наши флористы — настоящие мастера с художественным вкусом, которые ежедневно создают шедевры флористики. Мы гордимся тем, что помогаем людям выражать свои чувства через красоту природы.</p>
+                        <p>Наши флористы — настоящие мастера с художественным вкусом, которые ежедневно создают шедевры флористики.</p>
                     </div>
                 </div>
             </div>
@@ -353,7 +362,6 @@ function HomePage({ addToCart }) {
     );
 }
 
-/* ================= АВТОРИЗАЦИЯ ================= */
 function AuthPage({ loginUser, setPage }) {
     const [isLogin, setIsLogin] = useState(true);
     const [formData, setFormData] = useState({ name: '', email: '', password: '', phone: '' });
@@ -363,15 +371,11 @@ function AuthPage({ loginUser, setPage }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!formData.email || !formData.password || (!isLogin && (!formData.name || !formData.phone))) {
-            setError('Заполните все поля!'); return;
-        }
+        if (!formData.email || !formData.password || (!isLogin && (!formData.name || !formData.phone))) { setError('Заполните все поля!'); return; }
         setLoading(true); setError('');
         setTimeout(() => {
             setLoading(false);
-            const result = isLogin
-                ? LocalDB.login(formData.email, formData.password)
-                : LocalDB.register(formData);
+            const result = isLogin ? LocalDB.login(formData.email, formData.password) : LocalDB.register(formData);
             if (result.error) setError(result.error);
             else if (result.success) { loginUser(result.user); setPage('home'); }
         }, 300);
@@ -384,50 +388,33 @@ function AuthPage({ loginUser, setPage }) {
             <form onSubmit={handleSubmit}>
                 {!isLogin && (
                     <>
-                        <div className="form-group">
-                            <label>Ваше имя</label>
-                            <input type="text" placeholder="Иван" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
-                        </div>
-                        <div className="form-group">
-                            <label>Номер телефона</label>
-                            <input type="tel" placeholder="+7 (999) 000-00-00" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
-                        </div>
+                        <div className="form-group"><label>Ваше имя</label><input type="text" placeholder="Иван" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} /></div>
+                        <div className="form-group"><label>Номер телефона</label><input type="tel" placeholder="+7 (999) 000-00-00" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} /></div>
                     </>
                 )}
-                <div className="form-group">
-                    <label>Email</label>
-                    <input type="email" placeholder="mail@example.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
-                </div>
+                <div className="form-group"><label>Email</label><input type="email" placeholder="mail@example.com" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} /></div>
                 <div className="form-group">
                     <label>Пароль</label>
                     <div className="password-wrapper">
                         <input type={showPassword ? "text" : "password"} placeholder="••••••••" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
-                        <button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)}>
-                            {showPassword ? '🙈' : '👁️'}
-                        </button>
+                        <button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)}>{showPassword ? '🙈' : '👁️'}</button>
                     </div>
                 </div>
-                <button type="submit" className="btn" style={{ width: '100%' }} disabled={loading}>
-                    {loading ? 'Загрузка...' : (isLogin ? 'Войти' : 'Зарегистрироваться')}
-                </button>
+                <button type="submit" className="btn" style={{ width: '100%' }} disabled={loading}>{loading ? 'Загрузка...' : (isLogin ? 'Войти' : 'Зарегистрироваться')}</button>
             </form>
             <div className="auth-switch">
                 {isLogin ? 'Нет аккаунта? ' : 'Уже есть аккаунт? '}
-                <a onClick={() => { setIsLogin(!isLogin); setError(''); setShowPassword(false); }}>
-                    {isLogin ? 'Зарегистрируйтесь' : 'Войдите'}
-                </a>
+                <a onClick={() => { setIsLogin(!isLogin); setError(''); setShowPassword(false); }}>{isLogin ? 'Зарегистрируйтесь' : 'Войдите'}</a>
             </div>
             {isLogin && (
                 <div style={{ marginTop: '20px', padding: '10px', background: '#fff8dc', borderRadius: '8px', fontSize: '12px', color: '#666', textAlign: 'center', lineHeight: 1.5 }}>
-                    <strong>Демо-админ:</strong><br/>
-                    admin@flowershop.ru / admin123
+                    <strong>Демо-админ:</strong><br/>admin@flowershop.ru / admin123
                 </div>
             )}
         </div>
     );
 }
 
-/* ================= КОРЗИНА ================= */
 function CartPage({ cart, removeFromCart, getTotal, setPage, clearCart, currentUser }) {
     const [paymentMethod, setPaymentMethod] = useState('card');
     const [loading, setLoading] = useState(false);
@@ -436,63 +423,23 @@ function CartPage({ cart, removeFromCart, getTotal, setPage, clearCart, currentU
     const [cardData, setCardData] = useState({ number: '', expiry: '', cvv: '' });
     const [isProcessing, setIsProcessing] = useState(false);
 
-    if (cart.length === 0) {
-        return (
-            <div className="not-found glass-panel">
-                <h2>Ваша корзина пуста 😢</h2>
-                <button className="btn" style={{ marginTop: '20px' }} onClick={() => setPage('catalog')}>Перейти к покупкам</button>
-            </div>
-        );
-    }
+    if (cart.length === 0) return <div className="not-found glass-panel"><h2>Ваша корзина пуста 😢</h2><button className="btn" style={{ marginTop: '20px' }} onClick={() => setPage('catalog')}>Перейти к покупкам</button></div>;
 
     const executeOrder = () => {
-        if (!currentUser?.id) {
-            alert('Ошибка: Не удалось определить ID пользователя. Пожалуйста, войдите в аккаунт заново.');
-            setPage('auth'); return;
-        }
+        if (!currentUser?.id) { alert('Ошибка: Войдите в аккаунт заново.'); setPage('auth'); return; }
         setLoading(true);
-        const orderData = {
-            user_id: currentUser.id,
-            user_name: currentUser.name,
-            user_email: currentUser.email,
-            total_price: getTotal(),
-            payment_method: paymentMethod,
-            phone: phone,
-            items: cart.map(item => ({
-                id: item.id,
-                product_name: item.title,
-                quantity: item.quantity,
-                price: item.price
-            }))
-        };
+        const orderData = { user_id: currentUser.id, user_name: currentUser.name, user_email: currentUser.email, total_price: getTotal(), payment_method: paymentMethod, phone: phone, items: cart.map(item => ({ id: item.id, product_name: item.title, quantity: item.quantity, price: item.price })) };
         setTimeout(() => {
             const result = LocalDB.createOrder(orderData);
-            setLoading(false);
-            setShowCardModal(false);
-            if (result.success) {
-                alert(`Всё прошло успешно, ожидайте ваш заказ! (Заказ №${result.order_id})`);
-                clearCart();
-                setPage('user_orders');
-            } else {
-                alert('Ошибка при создании заказа: ' + (result.error || 'Неизвестная ошибка'));
-            }
+            setLoading(false); setShowCardModal(false);
+            if (result.success) { alert(`Всё прошло успешно! (Заказ №${result.order_id})`); clearCart(); setPage('user_orders'); }
         }, 400);
     };
 
     const handlePayClick = () => {
         if (!currentUser) { alert('Для оформления заказа необходимо войти в аккаунт!'); setPage('auth'); return; }
-        if (!phone) { alert('Пожалуйста, укажите номер телефона для связи!'); return; }
-        if (paymentMethod === 'card') setShowCardModal(true);
-        else executeOrder();
-    };
-
-    const handleCardSubmit = (e) => {
-        e.preventDefault();
-        if (cardData.number.replace(/\s/g, '').length < 16 || cardData.expiry.length < 5 || cardData.cvv.length < 3) {
-            alert("Пожалуйста, введите корректные данные карты!"); return;
-        }
-        setIsProcessing(true);
-        setTimeout(() => { setIsProcessing(false); executeOrder(); }, 1500);
+        if (!phone) { alert('Укажите номер телефона!'); return; }
+        if (paymentMethod === 'card') setShowCardModal(true); else executeOrder();
     };
 
     return (
@@ -513,12 +460,8 @@ function CartPage({ cart, removeFromCart, getTotal, setPage, clearCart, currentU
             </div>
             <div className="cart-summary glass-panel">
                 <h2>Оформление заказа</h2>
-                <div className="form-group" style={{ marginTop: '20px' }}>
-                    <label>Номер телефона для уведомлений</label>
-                    <input type="tel" placeholder="+7 (999) 000-00-00" value={phone} onChange={e => setPhone(e.target.value)} />
-                </div>
+                <div className="form-group" style={{ marginTop: '20px' }}><label>Номер телефона</label><input type="tel" placeholder="+7 (999) 000-00-00" value={phone} onChange={e => setPhone(e.target.value)} /></div>
                 <div className="cart-total"><span>Сумма:</span><span>{getTotal()} ₽</span></div>
-                <h3 style={{ fontSize: '16px', marginBottom: '10px' }}>Способ оплаты:</h3>
                 <div className="payment-methods">
                     <button className={`payment-btn ${paymentMethod === 'card' ? 'active' : ''}`} onClick={() => setPaymentMethod('card')}>💳 Картой</button>
                     <button className={`payment-btn ${paymentMethod === 'qr' ? 'active' : ''}`} onClick={() => setPaymentMethod('qr')}>📱 QR-код</button>
@@ -529,9 +472,7 @@ function CartPage({ cart, removeFromCart, getTotal, setPage, clearCart, currentU
                         <p style={{ fontSize: '14px', color: 'gray' }}>Отсканируйте для оплаты</p>
                     </div>
                 )}
-                <button className="btn" style={{ width: '100%', marginTop: '10px' }} onClick={handlePayClick} disabled={loading}>
-                    {loading ? 'Отправка...' : `Оплатить ${getTotal()} ₽`}
-                </button>
+                <button className="btn" style={{ width: '100%', marginTop: '10px' }} onClick={handlePayClick} disabled={loading}>{loading ? 'Отправка...' : `Оплатить ${getTotal()} ₽`}</button>
             </div>
 
             {showCardModal && (
@@ -539,35 +480,13 @@ function CartPage({ cart, removeFromCart, getTotal, setPage, clearCart, currentU
                     <div className="card-modal">
                         <h2>Оплата картой</h2>
                         {isProcessing ? (
-                            <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                                <div className="spinner"></div>
-                                <p style={{ marginTop: '20px', color: 'gray' }}>Связь с банком...</p>
-                            </div>
+                            <div style={{ textAlign: 'center', padding: '40px 0' }}><div className="spinner"></div><p style={{ marginTop: '20px', color: 'gray' }}>Связь с банком...</p></div>
                         ) : (
-                            <form onSubmit={handleCardSubmit}>
-                                <div className="card-input-group">
-                                    <label>Номер карты</label>
-                                    <input type="text" placeholder="0000 0000 0000 0000" maxLength="19" value={cardData.number}
-                                        onChange={(e) => {
-                                            const v = e.target.value.replace(/\D/g, '');
-                                            setCardData({ ...cardData, number: v.replace(/(\d{4})/g, '$1 ').trim() });
-                                        }} />
-                                </div>
+                            <form onSubmit={(e) => { e.preventDefault(); setIsProcessing(true); setTimeout(() => { setIsProcessing(false); executeOrder(); }, 1500); }}>
+                                <div className="card-input-group"><label>Номер карты</label><input type="text" placeholder="0000 0000 0000 0000" maxLength="19" value={cardData.number} onChange={(e) => { const v = e.target.value.replace(/\D/g, ''); setCardData({ ...cardData, number: v.replace(/(\d{4})/g, '$1 ').trim() }); }} /></div>
                                 <div className="card-row">
-                                    <div className="card-input-group">
-                                        <label>Срок действия</label>
-                                        <input type="text" placeholder="ММ/ГГ" maxLength="5" value={cardData.expiry}
-                                            onChange={(e) => {
-                                                let v = e.target.value.replace(/\D/g, '');
-                                                if (v.length >= 2) v = v.slice(0, 2) + '/' + v.slice(2);
-                                                setCardData({ ...cardData, expiry: v });
-                                            }} />
-                                    </div>
-                                    <div className="card-input-group">
-                                        <label>CVV код</label>
-                                        <input type="password" placeholder="•••" maxLength="3" value={cardData.cvv}
-                                            onChange={(e) => setCardData({ ...cardData, cvv: e.target.value.replace(/\D/g, '') })} />
-                                    </div>
+                                    <div className="card-input-group"><label>Срок действия</label><input type="text" placeholder="ММ/ГГ" maxLength="5" value={cardData.expiry} onChange={(e) => { let v = e.target.value.replace(/\D/g, ''); if (v.length >= 2) v = v.slice(0, 2) + '/' + v.slice(2); setCardData({ ...cardData, expiry: v }); }} /></div>
+                                    <div className="card-input-group"><label>CVV код</label><input type="password" placeholder="•••" maxLength="3" value={cardData.cvv} onChange={(e) => setCardData({ ...cardData, cvv: e.target.value.replace(/\D/g, '') })} /></div>
                                 </div>
                                 <div style={{ display: 'flex', gap: '10px', marginTop: '20px', flexDirection: 'column' }}>
                                     <button type="submit" className="btn">Списать {getTotal()} ₽</button>
@@ -582,70 +501,33 @@ function CartPage({ cart, removeFromCart, getTotal, setPage, clearCart, currentU
     );
 }
 
-/* ================= МОИ ЗАКАЗЫ ================= */
 function UserOrdersPage({ currentUser }) {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
 
-    const fetchUserOrders = (isManual = false) => {
-        if (!currentUser?.id) { setLoading(false); return; }
-        if (isManual) setRefreshing(true);
-        setTimeout(() => {
+    useEffect(() => {
+        if (currentUser?.id) {
             setOrders(LocalDB.getUserOrders(currentUser.id));
-            setLoading(false);
-            setRefreshing(false);
-        }, 200);
-    };
+        }
+        setLoading(false);
+    }, [currentUser]);
 
-    useEffect(() => { fetchUserOrders(); }, [currentUser]);
-
-    if (loading) return <div style={{ textAlign: 'center', margin: '50px' }}>Загрузка ваших заказов...</div>;
+    if (loading) return <div style={{ textAlign: 'center', margin: '50px' }}>Загрузка...</div>;
 
     return (
         <div className="admin-orders-container glass-panel">
-            <div className="admin-title">
-                <span>Мои заказы</span>
-                <button className={`refresh-btn ${refreshing ? 'spinning' : ''}`} onClick={() => fetchUserOrders(true)} disabled={refreshing}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path>
-                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-                    </svg>
-                    Обновить
-                </button>
-            </div>
-
-            {orders.length === 0 ? (
-                <p style={{ textAlign: 'center', color: 'gray', margin: '20px 0' }}>У вас пока нет заказов.</p>
-            ) : (
+            <div className="admin-title"><span>Мои заказы</span></div>
+            {orders.length === 0 ? <p style={{ textAlign: 'center', color: 'gray' }}>У вас пока нет заказов.</p> : (
                 <table className="orders-table">
-                    <thead>
-                        <tr><th>№</th><th>Дата</th><th>Сумма</th><th>Состав</th><th>Статус</th></tr>
-                    </thead>
+                    <thead><tr><th>№</th><th>Дата</th><th>Сумма</th><th>Состав</th><th>Статус</th></tr></thead>
                     <tbody>
                         {orders.map(order => (
                             <tr key={order.id}>
                                 <td data-label="№">#{order.id}</td>
                                 <td data-label="Дата">{new Date(order.created_at).toLocaleString('ru-RU')}</td>
-                                <td data-label="Сумма" style={{ fontWeight: 'bold', color: 'var(--primary-color)' }}>
-                                    {order.total_price} ₽<br />
-                                    <small>{order.payment_method === 'card' ? 'Карта' : 'QR-код'}</small>
-                                </td>
-                                <td data-label="Состав">
-                                    <ul className="order-items-list">
-                                        {order.items && order.items.map((item, idx) => (
-                                            <li key={idx}>{item.product_name || item.title} — {item.quantity} шт.</li>
-                                        ))}
-                                    </ul>
-                                </td>
-                                <td data-label="Статус">
-                                    <div className="status-badge" style={{
-                                        background: order.status === 'Завершен' ? '#d4edda' : '#ffeeba',
-                                        color: order.status === 'Завершен' ? '#155724' : '#856404'
-                                    }}>
-                                        {order.status}
-                                    </div>
-                                </td>
+                                <td data-label="Сумма" style={{ fontWeight: 'bold', color: 'var(--primary-color)' }}>{order.total_price} ₽</td>
+                                <td data-label="Состав"><ul className="order-items-list">{order.items && order.items.map((item, idx) => <li key={idx}>{item.product_name || item.title} — {item.quantity} шт.</li>)}</ul></td>
+                                <td data-label="Статус"><div className="status-badge" style={{ background: order.status === 'Завершен' ? '#d4edda' : '#ffeeba', color: order.status === 'Завершен' ? '#155724' : '#856404' }}>{order.status}</div></td>
                             </tr>
                         ))}
                     </tbody>
@@ -655,86 +537,39 @@ function UserOrdersPage({ currentUser }) {
     );
 }
 
-/* ================= АДМИНКА ================= */
 function AdminOrdersPage() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [updateLoading, setUpdateLoading] = useState(false);
     const [confirmModal, setConfirmModal] = useState({ isOpen: false, orderId: null });
 
-    const fetchOrders = () => {
-        const active = LocalDB.getAllOrders().filter(o => o.status !== 'Завершен');
-        setOrders(active);
-        setLoading(false);
-    };
-
+    const fetchOrders = () => { setOrders(LocalDB.getAllOrders().filter(o => o.status !== 'Завершен')); setLoading(false); };
     useEffect(() => { fetchOrders(); }, []);
 
     const changeStatus = (orderId, newStatus) => {
-        setUpdateLoading(true);
-        setTimeout(() => {
-            const result = LocalDB.updateStatus(orderId, newStatus);
-            setUpdateLoading(false);
-            if (result.success) { alert(result.message); fetchOrders(); }
-            else alert('Ошибка: ' + result.error);
-        }, 150);
+        const result = LocalDB.updateStatus(orderId, newStatus);
+        if (result.success) { alert(result.message); fetchOrders(); }
     };
 
-    const handleStatusClick = (orderId, status) => {
-        if (status === 'Завершен') setConfirmModal({ isOpen: true, orderId });
-        else changeStatus(orderId, status);
-    };
-
-    const handleConfirmComplete = () => {
-        changeStatus(confirmModal.orderId, 'Завершен');
-        setConfirmModal({ isOpen: false, orderId: null });
-    };
-
-    if (loading) return <div style={{ textAlign: 'center', margin: '50px' }}>Загрузка заказов...</div>;
-
+    if (loading) return <div style={{ textAlign: 'center', margin: '50px' }}>Загрузка...</div>;
     const statuses = ['Новый', 'Приняли', 'Собираем', 'Готово к выдаче', 'Завершен'];
 
     return (
         <div className="admin-orders-container glass-panel">
-            <h2 className="admin-title">Управление заказами (Админ)</h2>
-            {orders.length === 0 ? (
-                <p style={{ textAlign: 'center', color: 'gray', margin: '20px 0' }}>Нет активных заказов.</p>
-            ) : (
+            <h2 className="admin-title">Управление заказами</h2>
+            {orders.length === 0 ? <p style={{ textAlign: 'center', color: 'gray' }}>Нет активных заказов.</p> : (
                 <table className="orders-table">
-                    <thead>
-                        <tr><th>№</th><th>Дата</th><th>Покупатель / Тел.</th><th>Сумма</th><th>Состав</th><th>Статус</th></tr>
-                    </thead>
+                    <thead><tr><th>№</th><th>Дата</th><th>Покупатель</th><th>Сумма</th><th>Статус</th></tr></thead>
                     <tbody>
                         {orders.map(order => (
                             <tr key={order.id}>
                                 <td data-label="№">#{order.id}</td>
                                 <td data-label="Дата">{new Date(order.created_at).toLocaleString('ru-RU')}</td>
-                                <td data-label="Покупатель / Тел.">
-                                    <strong>{order.user_name}</strong><br />
-                                    <span style={{ color: 'var(--primary-color)', fontWeight: 'bold' }}>{order.phone || 'Нет номера'}</span><br />
-                                    <small style={{ color: 'gray' }}>{order.user_email}</small>
-                                </td>
-                                <td data-label="Сумма" style={{ fontWeight: 'bold', color: 'var(--primary-color)' }}>
-                                    {order.total_price} ₽<br />
-                                    <small>{order.payment_method === 'card' ? 'Карта' : 'QR-код'}</small>
-                                </td>
-                                <td data-label="Состав">
-                                    <ul className="order-items-list">
-                                        {order.items.map((item, idx) => (
-                                            <li key={idx}>{item.product_name || item.title} — {item.quantity} шт.</li>
-                                        ))}
-                                    </ul>
-                                </td>
+                                <td data-label="Покупатель"><strong>{order.user_name}</strong><br/><span style={{ color: 'var(--primary-color)' }}>{order.phone}</span></td>
+                                <td data-label="Сумма">{order.total_price} ₽</td>
                                 <td data-label="Статус">
-                                    <div className="status-badge">{order.status}</div>
                                     <div className="status-actions">
                                         {statuses.map(status => (
-                                            <button key={status}
-                                                className={`status-btn ${order.status === status ? 'active' : ''}`}
-                                                onClick={() => handleStatusClick(order.id, status)}
-                                                disabled={updateLoading || order.status === status}>
-                                                {status}
-                                            </button>
+                                            <button key={status} className={`status-btn ${order.status === status ? 'active' : ''}`} onClick={() => { if (status === 'Завершен') setConfirmModal({ isOpen: true, orderId: order.id }); else changeStatus(order.id, status); }} disabled={order.status === status}>{status}</button>
                                         ))}
                                     </div>
                                 </td>
@@ -743,18 +578,12 @@ function AdminOrdersPage() {
                     </tbody>
                 </table>
             )}
-
             {confirmModal.isOpen && (
                 <div className="modal-overlay" style={{ zIndex: 2000, background: 'transparent', backdropFilter: 'none' }}>
-                    <div className="modal-content" style={{ maxWidth: '400px', padding: '40px', textAlign: 'center', boxShadow: '0 10px 40px rgba(0,0,0,0.2)' }}>
+                    <div className="modal-content" style={{ maxWidth: '400px', padding: '40px', textAlign: 'center' }}>
                         <h2 style={{ color: 'var(--primary-color)', marginBottom: '20px' }}>Завершить заказ?</h2>
-                        <p style={{ fontSize: '16px', marginBottom: '30px', color: '#555' }}>
-                            Вы уверены, что хотите завершить заказ #{confirmModal.orderId}? Он исчезнет из списка активных заказов.
-                        </p>
                         <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
-                            <button className="btn" onClick={handleConfirmComplete} disabled={updateLoading}>
-                                {updateLoading ? 'Загрузка...' : 'Да'}
-                            </button>
+                            <button className="btn" onClick={() => { changeStatus(confirmModal.orderId, 'Завершен'); setConfirmModal({ isOpen: false, orderId: null }); }}>Да</button>
                             <button className="btn btn-outline" onClick={() => setConfirmModal({ isOpen: false, orderId: null })}>Нет</button>
                         </div>
                     </div>
@@ -764,7 +593,6 @@ function AdminOrdersPage() {
     );
 }
 
-/* ================= ГЛАВНЫЙ КОМПОНЕНТ ================= */
 function App() {
     const [page, setPage] = useState('home');
     const [cart, setCart] = useState([]);
@@ -797,18 +625,8 @@ function App() {
     const getTotal = () => cart.reduce((t, item) => t + (item.price * item.quantity), 0);
     const cartCount = cart.reduce((t, item) => t + item.quantity, 0);
 
-    const loginUser = (user) => {
-        setCurrentUser(user);
-        localStorage.setItem('flower-current-user', JSON.stringify(user));
-    };
-
-    const logout = () => {
-        setCurrentUser(null);
-        localStorage.removeItem('flower-current-user');
-        setCart([]);
-        localStorage.removeItem('flower-cart');
-        setPage('home');
-    };
+    const loginUser = (user) => { setCurrentUser(user); localStorage.setItem('flower-current-user', JSON.stringify(user)); };
+    const logout = () => { setCurrentUser(null); localStorage.removeItem('flower-current-user'); setCart([]); localStorage.removeItem('flower-cart'); setPage('home'); };
 
     let content;
     if (page === 'home' || page === 'catalog') content = <HomePage addToCart={addToCart} />;
