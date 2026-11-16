@@ -281,7 +281,6 @@ function HomePage({ addToCart }) {
                 </section>
             </div>
 
-            {/* БЛОК О КОМПАНИИ */}
             <div className="home-section glass-panel">
                 <div className="about-section">
                     <div className="about-image">
@@ -296,7 +295,6 @@ function HomePage({ addToCart }) {
                 </div>
             </div>
 
-            {/* СТАНДАРТНЫЙ КАТАЛОГ */}
             <div id="catalog">
                 <h2 style={{ textAlign: 'center', marginTop: '40px', marginBottom: '20px', fontSize: '32px', color: 'var(--primary-color)', fontWeight: '700' }}>Каталог букетов</h2>
                 <div className="products-grid">
@@ -315,6 +313,7 @@ function HomePage({ addToCart }) {
                 </div>
             </div>
 
+            {/* БАННЕР КОНСТРУКТОРА - ИСПРАВЛЕННЫЙ */}
             <div className="constructor-banner" onClick={() => setIsConstructorOpen(true)}>
                 <div className="constructor-banner-images">
                     <img src="images/5-provence.png" alt="Букет" />
