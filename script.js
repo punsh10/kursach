@@ -268,12 +268,6 @@ function HomePage({ addToCart }) {
     const [isConstructorOpen, setIsConstructorOpen] = useState(false);
     const [selectedBouquet, setSelectedBouquet] = useState(null);
 
-    const featured = [
-        FLOWERS_DATA.find(p => p.title.includes("Белый шик")),
-        FLOWERS_DATA.find(p => p.title.includes("Полевой роман")),
-        FLOWERS_DATA.find(p => p.title.includes("Закат в Провансе"))
-    ].filter(Boolean);
-
     return (
         <div id="top">
             <div className="home-section glass-panel">
@@ -287,32 +281,7 @@ function HomePage({ addToCart }) {
                 </section>
             </div>
 
-            {/* БАННЕР */}
-            <div className="featured-banner-container">
-                <div className="featured-images">
-                    {featured.map(bouquet => (
-                        <div key={bouquet.id} className="featured-img-wrapper">
-                            <img src={bouquet.image} alt={bouquet.title} />
-                            <div className="featured-label">
-                                <h4>{bouquet.title.replace("Букет ", "")}</h4>
-                                <p>{bouquet.price} ₽</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-                <div className="featured-text-panel">
-                    <h2>Выбери какой букет хочешь ты!</h2>
-                    <p style={{marginTop: '20px', color: '#555', lineHeight: '1.6'}}>
-                        Каждый из этих букетов — настоящая история. 
-                        От элегантного «Белого шика» до ностальгического «Полевого романа». 
-                        Нажми на карточку товара в каталоге, чтобы добавить его в корзину.
-                    </p>
-                    <button className="btn" style={{marginTop: '30px'}} onClick={() => document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth' })}>
-                        Смотреть весь каталог
-                    </button>
-                </div>
-            </div>
-
+            {/* БЛОК О КОМПАНИИ */}
             <div className="home-section glass-panel">
                 <div className="about-section">
                     <div className="about-image">
@@ -327,6 +296,7 @@ function HomePage({ addToCart }) {
                 </div>
             </div>
 
+            {/* СТАНДАРТНЫЙ КАТАЛОГ */}
             <div id="catalog">
                 <h2 style={{ textAlign: 'center', marginTop: '40px', marginBottom: '20px', fontSize: '32px', color: 'var(--primary-color)', fontWeight: '700' }}>Каталог букетов</h2>
                 <div className="products-grid">
@@ -362,6 +332,7 @@ function HomePage({ addToCart }) {
     );
 }
 
+/* ================= ОСТАЛЬНЫЕ СТРАНИЦЫ ================= */
 function AuthPage({ loginUser, setPage }) {
     const [isLogin, setIsLogin] = useState(true);
     const [formData, setFormData] = useState({ name: '', email: '', password: '', phone: '' });
